@@ -1,0 +1,72 @@
+---
+title: "KW_HW1_SRM610"
+author: "Kim Wiggins // SRM 610 HW1 // July 01, 21"
+output:
+  pdf_document: default
+Date: July 4, 2021
+---
+
+```{r libraries, include=FALSE}
+library(KernSmooth)
+library(MVA)
+load(file = "HW1.RData")
+```
+**Question 1.a** \hfill\break
+Print the data showing the park names, park sizes and visitors.
+```{r, include=TRUE}
+parks
+```
+*Printed Data showing park names, park sizes, and visitors.*
+\hfill\break\hfill\break
+**Question 1.b**\hfill\break
+Obtain and show the sample covariance matrix and the sample correlation matrix. Interpret the sample correlation matrix. How does the correlation matrix differ from the Pearson's correlation coefficient?
+```{r}
+cov(parks)
+```
+*Covariance matrix, Parks data*
+```{r}
+cor(parks)
+```
+*Correlation Matrix, Parks Data*
+\hfill\break\hfill\break
+The correlation matrix displays the Pearson correlation coefficient between two variables to demonstrate how strongly those variables are related to each other. As the scaled form of covariance, correlation coefficients are standardized (non-scalar) and dimensionless (unit-free), and can thus be interpreted easily on a scale from -1 to +1. Covariance values vary from negative infinity to positive infinity. While covariance indicates the direction of the relationship only, correlation indicates direction and strength, resulting in a proportion metric measuring how much on average these variables differ with regard to one another. </br>
+
+Because the covariance matrix isn't scaled, we can only interpret direction. The size of the park is measured on a different scale than the visitor count, so interpretation regarding strength of the direction is not appropriate using the covariance matrix. 
+In this case, the covariance matrix tells us that the relationship is positive, but the correlation coefficient of 0.173 being so close to 0 indicates that the linear relationship is not strong. The variables may have some other strong relationship that is not linear, and we must take care to not interpret a 0 (or values close to 0) as indicating lack of any relationship - only lack of a strong linear one. 
+\hfill\break\hfill\break
+**Question 1.c**\hfill\break
+Draw a matrix of plots containing histograms and boxplots of park sizes and number of visitors. Give appropriate titles and axes labels for the histograms. Interpret the graph.
+```{r}
+layout(matrix(1:2, nc=2))
+boxplot(parks$size, main = "Size")
+boxplot(parks$visitors, main = "Visitors")
+```
+Examination of the boxplots indicate two outliers: one for each variable. Visual inspection of the elements reveal the potential outliers to be Yellowstone for Size, and Great Smoky for visitors. 
+
+Histograms 
+```{r}
+par(mfrow=c(2,1))
+hist(parks$size, main = "Park Acreage, in Thousands", xlab = "Size", prob= T)
+hist(parks$visitors, main = "Park Annual Visitors, in Thousands", xlab = "Visitors", prob = T)
+
+```
+Histograms indicate that most values for Size fall within the 0-1000 range. Visitor ranges indicate the majority of observations fall between 1 and 4, with a potential outlier in the 8-10 range. 
+
+**Question 2**\hfill\break
+Explore for possible outliers. Use appropriate graphs to draw conclusions. Calculate correlation coefficient between park size and number of park visitors before and after removing possible outliers. Comment on your findings. 
+
+```{r}
+outpark = match(parkname <- c("Great Smoky", "Yellostone"), rownames(parks))
+bvbox(parks, mtitle = "Bivariate Boxplot, Parks", xlab = size.lab, ylab = visitors.lab)
+text(parks$size[outpark], parks$visitors[outpark], labels = parkname, pos = c(2,2,4,2,2))
+```
+The outliers are labeled, and will be removed from future analysis. After exluding the outliers, the correlation coefficient increases from 0.173 to 0.399.
+
+```{r}
+with(parks, cor(size, visitors))
+```
+```{r}
+with(parks, cor(size[-outpark], visitors[-outpark]))
+```
+
+```{r}
